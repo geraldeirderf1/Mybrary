@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const express = require('express')
 const app = express()
-const PORT = process.env.PORT || 3000
+// const PORT = process.env.PORT || 3000
 const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
@@ -34,8 +34,10 @@ const connectDB = async () => {
 app.use('/', indexRouter)
 app.use('/authors', authorRouter)
 
+// Connect to the database before listening
+
 connectDB().then(() => {
-    app.listen(PORT, () => {
+    app.listen(process.env.PORT || 3000, () => {
         console.log("listening for requests")
     })
 })
