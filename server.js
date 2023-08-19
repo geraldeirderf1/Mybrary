@@ -3,9 +3,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const express = require('express')
 const app = express()
+const PORT = process.env.PORT || 3000
 const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require('body-parser')
-
+const mongoose = require('mongoose')
 const indexRouter = require('./routes/index')
 const authorRouter = require('./routes/authors')
 
@@ -16,14 +17,27 @@ app.use(expressLayouts)
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 
-const mongoose = require('mongoose')
-mongoose.connect(process.env.DATABASE_URL)
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.DATABASE_URL)
+        console.log(`MongoDB Connected: ${conn.connection.host}`)
+    } catch (error) {
+        console.log(error)
+        process.exit(1);
+    }
+}
 
-const db = mongoose.connection
-db.on('error', error => console.error(error))
-db.once('open', () => console.log('Connected to Mongoose'))
+// const db = mongoose.connection
+// db.on('error', error => console.error(error))
+// db.once('open', () => console.log('Connected to Mongoose'))
 
 app.use('/', indexRouter)
 app.use('/authors', authorRouter)
 
-app.listen(process.env.PORT || 3000)
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("listening for requests")
+    })
+})
+
+// app.listen(process.env.PORT || 3000)
